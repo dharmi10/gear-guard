@@ -43,3 +43,14 @@ app.get('/api/health', (req, res) => {
 // ===========================================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
+
+// server.js (Simplified Example)
+app.get('/api/requests', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM maintenance_requests');
+    res.json(result.rows); // Sends data to your React frontend
+  } catch (err) {
+    res.status(500).send("Server Error");
+  }
+});

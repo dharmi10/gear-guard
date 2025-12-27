@@ -12,19 +12,10 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const userEmail = formData.email.toLowerCase();
-
-    // Logic to determine which dashboard to open based on email keywords
-    // This matches the routes you defined in App.jsx
-    if (userEmail.includes('admin')) {
-      navigate('/admin-dashboard');
-    } else if (userEmail.includes('manager')) {
-      navigate('/manager-dashboard');
-    } else if (userEmail.includes('tech')) {
-      navigate('/dashboard'); // Technician Dashboard
-    } else {
-      navigate('/requester-dashboard'); // Default Employee Dashboard
-    }
+    
+    // Directing all users to the Technician Dashboard immediately
+    // This path matches the Route path="/dashboard" in your App.jsx
+    navigate('/dashboard'); 
   };
 
   return (

@@ -10,14 +10,16 @@ import MaintenanceCalendar from './pages/MaintenanceCalendar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Signup from './pages/Signup';
-
+import MyProfile from './pages/MyProfile';
+import TechProfile from './pages/TechProfile';
 // Role-Based Pages 
 import RequesterDashboard from './pages/RequesterDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import MyProfile from './pages/MyProfile'; 
-import TechProfile from './pages/TechProfile'; // Import your new Tech Profile page
+import MaintenanceRequests from './pages/MaintenanceRequests';
+import EquipmentManagement from './pages/EquipmentManagement';
 
+import MaintenanceTeams from './pages/MaintenanceTeams';
 // Layout handles conditional Navbar visibility
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -66,6 +68,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} /> 
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/requests" element={<MaintenanceRequests />} />
+            <Route path="/admin/equipment" element={<EquipmentManagement />} />
             
             {/* 3. Profiles */}
             <Route path="/profile" element={<MyProfile />} /> {/* Requester Side */}
@@ -76,7 +80,15 @@ function App() {
             <Route path="/kanban" element={<KanbanBoard />} />
             <Route path="/calendar" element={<MaintenanceCalendar />} />
             
-            {/* 5. Auth Routes */}
+            {/* 2. ADD the Admin Route */}
+            <Route path="/admin" element={<AdminDashboard />} />
+          
+<Route path="/admin/requests" element={<MaintenanceRequests />} />
+<Route path="/admin/equipment" element={<EquipmentManagement />} />
+<Route path="/admin/teams" element={<MaintenanceTeams />} /> // 2. ENSURE THIS PATH MATCHES SIDEBAR
+        
+
+            {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/signup" element={<Signup />} />

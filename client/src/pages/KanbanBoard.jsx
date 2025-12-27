@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Ensure axios is installed: npm install axios
-import { Clock, Building2, User, Wrench, AlertCircle, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
+import { Building2, Wrench, RefreshCw } from 'lucide-react';
 
 const KanbanBoard = () => {
   const stages = [
@@ -10,115 +10,105 @@ const KanbanBoard = () => {
     { id: 'Scrap', color: 'bg-red-500' }
   ];
 
-  // 1. CHANGE: Start with an empty array for dynamic data
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. CHANGE: Fetch real data from your backend on mount
+  // FETCH DATA ON MOUNT
   useEffect(() => {
     fetchRequests();
   }, []);
 
   const fetchRequests = async () => {
     try {
-      // Replace with your actual backend URL
+      // Connects to your backend to get all submitted requests
       const response = await axios.get('http://localhost:5000/api/dashboard/requests');
       setRequests(response.data);
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching dynamic data:", err);
+      console.error("Error fetching requests:", err);
       setLoading(false);
     }
   };
 
-  // 3. CHANGE: Add function to update stage in the database
+  // UPDATE STAGE IN DATABASE
   const updateStage = async (requestId, newStage) => {
     try {
+      // Sends a PUT request to update the 'stage' column for this specific ID
       await axios.put(`http://localhost:5000/api/dashboard/requests/${requestId}`, { 
         stage: newStage 
       });
-      // Refresh data to ensure UI matches DB
+      // Immediately refresh the board to show the item in its new column
       fetchRequests();
     } catch (err) {
-      console.error("Failed to update stage in real-time");
+      console.error("Failed to update ticket stage");
     }
   };
 
-  if (loading) return <div className="p-6 text-center">Loading live pipeline...</div>;
+  if (loading) return <div className="p-8 text-center text-slate-500">Loading Pipeline...</div>;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-slate-50 min-h-screen font-sans">
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Maintenance Pipeline</h1>
-          <p className="text-slate-500">Real-time lifecycle management.</p>
+          <p className="text-slate-500 text-sm">Real-time equipment lifecycle management.</p>
         </div>
-        <button onClick={fetchRequests} className="text-xs bg-white border px-3 py-1 rounded shadow-sm hover:bg-gray-50">
-          Sync Data
+        <button 
+          onClick={fetchRequests} 
+          className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 shadow-sm hover:bg-slate-50"
+        >
+          <RefreshCw size={14} /> Sync Data
         </button>
       </header>
 
       <div className="flex gap-6 overflow-x-auto pb-8">
         {stages.map((stage) => (
           <div key={stage.id} className="flex-shrink-0 w-80">
+            {/* Column Header */}
             <div className={`h-1.5 w-full ${stage.color} rounded-t-lg`}></div>
-            <div className="bg-white border-x border-b border-slate-200 p-3 flex justify-between items-center mb-4 shadow-sm">
-              <h2 className="font-bold text-slate-700 text-sm uppercase tracking-widest">{stage.id}</h2>
-              <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-xs font-bold">
+            <div className="bg-white border-x border-b border-slate-200 p-4 flex justify-between items-center mb-6 shadow-sm">
+              <h2 className="font-bold text-slate-700 text-xs uppercase tracking-widest">{stage.id}</h2>
+              <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold">
                 {requests.filter(r => r.stage === stage.id).length}
               </span>
             </div>
 
+            {/* Request Cards inside the Column */}
             <div className="space-y-4">
               {requests.filter(r => r.stage === stage.id).map((req) => (
-                <div key={req.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 hover:shadow-md transition-shadow group">
-                  
+                <div key={req.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition-all group">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-2 text-blue-600">
-                      <Building2 size={16} />
-                      <span className="text-xs font-bold truncate max-w-[150px]">{req.company_name || 'N/A'}</span>
+                      <Building2 size={14} />
+                      <span className="text-[10px] font-extrabold uppercase truncate max-w-[150px]">
+                        {req.maintenance_team || 'General'}
+                      </span>
                     </div>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                       {new Date(req.created_at).toLocaleDateString()}
-                    </span>
                   </div>
 
-                  <h3 className="text-sm font-bold text-slate-800 mb-1">
+                  <h3 className="text-sm font-bold text-slate-800 mb-2 leading-snug">
                     {req.subject}
                   </h3>
                   
-                  <div className="flex items-center gap-1 text-[11px] text-slate-500 mb-4">
-                    <Wrench size={12} />
-                    <span>{req.equipment_name}</span>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-5">
+                    <Wrench size={14} />
+                    <span className="font-medium">{req.equipment_id}</span>
                   </div>
 
-                  {/* Dynamic Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-[10px] mb-1 font-bold text-slate-500">
-                      <span>Progress</span>
-                      <span>{req.progress || 0}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full transition-all duration-500 ${req.stage === 'Scrap' ? 'bg-red-500' : 'bg-blue-500'}`} 
-                        style={{ width: `${req.progress || 0}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* Stage Switcher for Dynamic Control */}
-                  <div className="flex justify-between items-center pt-3 border-t border-slate-50">
+                  <div className="flex justify-between items-center pt-4 border-t border-slate-50">
+                    {/* Status Dropdown: Updates the database instantly */}
                     <select 
                       value={req.stage}
                       onChange={(e) => updateStage(req.id, e.target.value)}
-                      className="text-[10px] bg-slate-100 border-none rounded px-1 outline-none"
+                      className="text-[10px] bg-slate-100 font-bold border-none rounded-lg px-2 py-1 outline-none text-slate-600 cursor-pointer hover:bg-slate-200"
                     >
                       {stages.map(s => <option key={s.id} value={s.id}>{s.id}</option>)}
                     </select>
-                    <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded border ${
-                      req.type === 'Corrective' ? 'text-orange-600 border-orange-200 bg-orange-50' : 'text-purple-600 border-purple-200 bg-purple-50'
+                    
+                    <span className={`text-[9px] font-black px-2 py-0.5 rounded uppercase ${
+                      req.priority === 'Critical' ? 'text-red-600 bg-red-50' : 'text-blue-600 bg-blue-50'
                     }`}>
-                      {req.type}
+                      {req.priority || 'Medium'}
                     </span>
                   </div>
                 </div>

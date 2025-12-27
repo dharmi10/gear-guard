@@ -4,6 +4,7 @@ import {
   Calendar, BarChart3, Clock, AlertTriangle, 
   CheckCircle2, Plus, MoreVertical, Search, Bell
 } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 // --- Reusable Sub-Components ---
 
@@ -71,20 +72,28 @@ const AdminDashboard = () => {
           <span className="text-xl font-bold tracking-tight text-gray-900">GearGuard</span>
         </div>
         
-        <nav className="flex-1 px-4 space-y-1">
-          {[
-            { icon: LayoutDashboard, label: 'Dashboard', active: true },
-            { icon: Wrench, label: 'Maintenance' },
-            { icon: Calendar, label: 'Schedule' },
-            { icon: Users, label: 'Technicians' },
-            { icon: BarChart3, label: 'Analytics' },
-          ].map((item) => (
-            <button key={item.label} className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${item.active ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}>
-              <item.icon size={18} />
-              {item.label}
-            </button>
-          ))}
-        </nav>
+     
+
+<nav className="flex-1 px-4 space-y-1">
+  {[
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+    { icon: Wrench, label: 'Maintenance Requests', path: '/admin/requests' },
+    { icon: Settings, label: 'Equipment', path: '/admin/equipment' },
+    { icon: Users, label: 'Maintenance Teams', path: '/admin/teams' }, // MUST MATCH App.jsx
+  ].map((item) => (
+    <NavLink 
+      key={item.label} 
+      to={item.path}
+      className={({ isActive }) => `
+        w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+        ${isActive ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}
+      `}
+    >
+      <item.icon size={18} />
+      {item.label}
+    </NavLink>
+  ))}
+</nav>
 
         <div className="p-4 border-t border-gray-100">
           <div className="flex items-center gap-3 px-2 py-3">
