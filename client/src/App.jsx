@@ -16,15 +16,16 @@ import RequesterDashboard from './pages/RequesterDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import MyProfile from './pages/MyProfile'; 
+import TechProfile from './pages/TechProfile'; // Import your new Tech Profile page
 
 // Layout handles conditional Navbar visibility
 const Layout = ({ children }) => {
   const location = useLocation();
   
   /**
-   * We hide the default technician Navbar on these paths.
-   * This ensures the UserNavbar inside RequesterDashboard and MyProfile 
-   * is the only one visible.
+   * We hide the default technician Navbar on these specific paths.
+   * NOTE: We do NOT add '/tech-profile' here because we WANT the 
+   * technician navbar to stay visible on the tech profile page.
    */
   const hideNavbarPaths = [
     '/login', 
@@ -32,14 +33,14 @@ const Layout = ({ children }) => {
     '/signup', 
     '/', 
     '/requester-dashboard', 
-    '/profile'
+    '/profile' // This is the user/requester profile
   ];
   
   const showNavbar = !hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
-      {/* Technician Navbar - only shows on tech/manager/admin routes */}
+      {/* Technician Navbar - shows on tech dashboard, tech-profile, etc. */}
       {showNavbar && <Navbar />}
       
       <div className={showNavbar ? "container mx-auto px-4 py-6" : ""}>
@@ -62,12 +63,13 @@ function App() {
             
             {/* 2. Role-Based Navigation Targets */}
             <Route path="/requester-dashboard" element={<RequesterDashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} /> {/* Technician Hub */}
+            <Route path="/dashboard" element={<Dashboard />} /> 
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             
-            {/* 3. User Profile Route */}
-            <Route path="/profile" element={<MyProfile />} />
+            {/* 3. Profiles */}
+            <Route path="/profile" element={<MyProfile />} /> {/* Requester Side */}
+            <Route path="/tech-profile" element={<TechProfile />} /> {/* Technician Side */}
 
             {/* 4. Application Tools (Technician Side) */}
             <Route path="/equipment" element={<EquipmentList />} />
