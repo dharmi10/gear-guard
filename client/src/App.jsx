@@ -11,21 +11,37 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Signup from './pages/Signup';
 
-// Role-Based Pages (Ensure these files exist in src/pages)
+// Role-Based Pages 
 import RequesterDashboard from './pages/RequesterDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import MyProfile from './pages/MyProfile'; 
 
 // Layout handles conditional Navbar visibility
 const Layout = ({ children }) => {
   const location = useLocation();
-  // Hide Navbar on Login, Register, and Signup pages
-  const hideNavbarPaths = ['/login', '/register', '/signup', '/'];
+  
+  /**
+   * We hide the default technician Navbar on these paths.
+   * This ensures the UserNavbar inside RequesterDashboard and MyProfile 
+   * is the only one visible.
+   */
+  const hideNavbarPaths = [
+    '/login', 
+    '/register', 
+    '/signup', 
+    '/', 
+    '/requester-dashboard', 
+    '/profile'
+  ];
+  
   const showNavbar = !hideNavbarPaths.includes(location.pathname);
 
   return (
     <>
+      {/* Technician Navbar - only shows on tech/manager/admin routes */}
       {showNavbar && <Navbar />}
+      
       <div className={showNavbar ? "container mx-auto px-4 py-6" : ""}>
         {children}
       </div>
@@ -41,30 +57,29 @@ function App() {
         
         <Layout>
           <Routes>
-            {/* Start on Login */}
+            {/* 1. Default Landing Page */}
             <Route path="/" element={<Login />} />
             
-            {/* Role-Based Navigation Targets */}
+            {/* 2. Role-Based Navigation Targets */}
             <Route path="/requester-dashboard" element={<RequesterDashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} /> {/* Technician */}
+            <Route path="/dashboard" element={<Dashboard />} /> {/* Technician Hub */}
             <Route path="/manager-dashboard" element={<ManagerDashboard />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             
-            {/* Application Tools */}
+            {/* 3. User Profile Route */}
+            <Route path="/profile" element={<MyProfile />} />
+
+            {/* 4. Application Tools (Technician Side) */}
             <Route path="/equipment" element={<EquipmentList />} />
             <Route path="/kanban" element={<KanbanBoard />} />
             <Route path="/calendar" element={<MaintenanceCalendar />} />
             
-            {/* 2. ADD the Admin Route */}
-            <Route path="/admin" element={<AdminDashboard />} />
-
-            {/* Auth Routes */}
+            {/* 5. Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-
             <Route path="/signup" element={<Signup />} />
             
-            {/* Redirect any typos back to Login */}
+            {/* 6. Catch-all: Redirect any errors back to login */}
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Layout>
