@@ -1,55 +1,55 @@
-const User = require('../models/User');
+// controllers/authController.js
+const pool = require('../db'); 
 
-// @desc    Register a new user
-// @route   POST /api/auth/register
-exports.register = async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
-
-    // 1. Check if user already exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+const register = async (req, res) => {
+    // We pull the same data from the frontend, but map it to the right DB columns
+    const { username, email, password, full_name } = req.body;
+    
+    try {
+        const result = await pool.query(
+            `INSERT INTO users (username, email, password_hash, full_name, role) 
+             VALUES ($1, $2, $3, $4, $5) 
+             RETURNING id, username, email, full_name, role`,
+            [username, email, password, full_name, 'user'] // Setting 'user' as default role
+        );
+        
+        res.status(201).json({ 
+            success: true, 
+            user: result.rows[0] 
+        });
+    } catch (err) {
+        console.error("Registration Error:", err.message);
+        // Providing the specific DB error helps you debug (e.g., duplicate email)
+        res.status(500).json({ error: err.message });
     }
-
-    // 2. Create new user
-    user = new User({
-      name,
-      email,
-      password, // Note: For production, you should hash this password using bcrypt
-      role
-    });
-
-    // 3. Save to database
-    await user.save();
-
-    res.status(201).json({ msg: 'User registered successfully', user });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
-exports.login = async (req, res) => {
-  try {
+// Update login to also use password_hash
+const login = async (req, res) => {
     const { email, password } = req.body;
+    try {
+        const result = await pool.query(
+            'SELECT * FROM users WHERE email = $1', 
+            [email]
+        );
+        
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
 
-    // 1. Check if user exists
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
+        const user = result.rows[0];
+        // Checking against password_hash column
+        if (user.password_hash !== password) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        res.json({ 
+            success: true, 
+            user: { id: user.id, username: user.username, role: user.role } 
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-
-    // 2. Simple password check (matches the plain text password above)
-    if (user.password !== password) {
-      return res.status(400).json({ msg: 'Invalid Credentials' });
-    }
-
-    res.json({ msg: 'Login successful', user });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server Error');
-  }
 };
+
+module.exports = { register, login };
