@@ -1,8 +1,11 @@
 // routes/dashboardRoutes.js
 const express = require('express');
 const router = express.Router();
-const { getDashboardStats } = require('../controllers/dashboardController');
-// routes/dashboardRoutes.js
+
+// ADD createRequest to the import list below
+const { getDashboardStats, createRequest } = require('../controllers/dashboardController');
+
+// Now this will work because createRequest is defined
 router.post('/requests', createRequest);
 
 router.get('/stats', getDashboardStats);
