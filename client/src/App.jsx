@@ -9,7 +9,8 @@ import KanbanBoard from './pages/KanbanBoard';
 import MaintenanceCalendar from './pages/MaintenanceCalendar';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Signup from './pages/Signup'; // New Import
+import Signup from './pages/Signup';
+import AdminDashboard from './pages/AdminDashboard'; // 1. IMPORT the AdminDashboard
 
 function App() {
   return (
@@ -26,10 +27,12 @@ function App() {
             <Route path="/kanban" element={<KanbanBoard />} />
             <Route path="/calendar" element={<MaintenanceCalendar />} />
             
+            {/* 2. ADD the Admin Route */}
+            <Route path="/admin" element={<AdminDashboard />} />
+
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            {/* Added Signup Route to match your file structure */}
             <Route path="/signup" element={<Signup />} /> 
           </Routes>
         </div>

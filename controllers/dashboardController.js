@@ -28,5 +28,20 @@ const getDashboardStats = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+// controllers/dashboardController.js
+const createRequest = async (req, res) => {
+  const { subject, equipment_id, scheduled_date, type, team_name } = req.body;
+  try {
+    const newRequest = await pool.query(
+      `INSERT INTO maintenance_requests 
+       (subject, equipment_id, scheduled_date, type, maintenance_team, stage) 
+       VALUES ($1, $2, $3, $4, $5, 'New') RETURNING *`,
+      [subject, equipment_id, scheduled_date, type, team_name]
+    );
+    res.json(newRequest.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 module.exports = { getDashboardStats };
